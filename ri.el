@@ -52,7 +52,7 @@
   (with-current-buffer (get-buffer-create ri-process-buffer)
     (display-buffer (current-buffer))
     (erase-buffer)
-    (insert (shell-command-to-string (format "%s --no-pager --format=ansi %s" ri-program-name class-name)))
+    (insert (shell-command-to-string (format "%s --no-pager --format=ansi %s" ri-program-name (shell-quote-argument class-name))))
     (ansi-color-apply-on-region (point-min) (point-max))
     (beginning-of-buffer)))
 
