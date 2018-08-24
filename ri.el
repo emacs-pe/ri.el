@@ -45,15 +45,27 @@
   "The name of the buffer where ri outputs the documentation."
   :group 'ri)
 
+(defun ri-all-known-topics ()
+  "Return a list of all known topics of ri"
+  (let* ((code "require 'rdoc/ri/driver'; \
+                driver = RDoc::RI::Driver.new; \
+                puts driver.list_known_classes; \
+                puts driver.list_methods_matching('.');")
+         (command (format "ruby -rrubygems -e\"%s\"" code)))
+    (split-string (shell-command-to-string command))))
+
 
 ;;;###autoload
-(defun ri (class-name)
-  (interactive "MClass-name: ")
-  (with-current-buffer (get-buffer-create ri-process-buffer)
-    (display-buffer (current-buffer))
-    (erase-buffer)
-    (insert (shell-command-to-string (format "%s --no-pager --format=ansi %s" ri-program-name (shell-quote-argument class-name))))
-    (ansi-color-apply-on-region (point-min) (point-max))
-    (beginning-of-buffer)))
+(defun ri (&optional ri-topic)
+  (interactive)
+  (let ((ri-topic (or ri-topic
+                      (completing-read "ri: " (ri-all-known-topics) nil t (or (symbol-at-point)
+                                                                              "")))))
+    (with-current-buffer (get-buffer-create ri-process-buffer)
+      (display-buffer (current-buffer))
+      (erase-buffer)
+      (insert (shell-command-to-string (format "%s --no-pager --format=ansi %s" ri-program-name (shell-quote-argument ri-topic))))
+      (ansi-color-apply-on-region (point-min) (point-max))
+      (beginning-of-buffer))))
 
 (provide 'ri)
