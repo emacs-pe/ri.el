@@ -29,7 +29,6 @@
 
 ;;; Code:
 
-(require 'thing-at-point)
 (require 'ansi-color)
 
 (defgroup ri nil
@@ -62,8 +61,8 @@
 (defun ri (&optional ri-topic)
   (interactive)
   (let ((ri-topic (or ri-topic
-                      (completing-read "ri: " (ri-all-known-topics) nil t (or (word-at-point)
-                                                                              "")))))
+                      (completing-read "ri: " (ri-all-known-topics) nil t (when-let (sym (symbol-at-point))
+                                                                             (symbol-name sym))))))
     (with-current-buffer (get-buffer-create ri-process-buffer)
       (display-buffer (current-buffer))
       (erase-buffer)
